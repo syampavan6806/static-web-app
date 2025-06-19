@@ -52,16 +52,10 @@ http://<EC2_PUBLIC_IP>
 
 ---
 
-## 📜 Notes
-
-- Uses Nginx to serve HTML/CSS content
-- Responsive layout supported
-- Easily extendable with more pages or contact form
-
-## 🤝 Maintainer
+## Maintainer
 
 **Balaji Reddy Lachhannagri**  
-Senior DevOps Trainer  
+Senior DevOps Architech  
 
 ---
 
