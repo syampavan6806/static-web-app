@@ -26,7 +26,7 @@ This is a static website for **Rushi Technologies** that showcases training prog
 ### Install nginx
 ```bash
 sudo yum update -y
-sudo yum install nginx
+sudo yum install nginx -y
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
@@ -35,6 +35,7 @@ sudo systemctl start nginx
 # Remove Existing(Already Deployed) Files 
 sudo rm -rf /usr/share/nginx/html/*
 # Clone or pull(If already Cloned) Latest Code
+sudo yum install git -y
 git clone https://github.com/Rushi-Technologies/static-web-app.git
 sudo cp -r static-web-app/* /usr/share/nginx/html/
 ```
