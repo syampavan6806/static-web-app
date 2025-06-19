@@ -11,7 +11,7 @@ This is a static website for **Rushi Technologies** that showcases training prog
 
 ---
 
-## 🚀 Deployment Instructions (Amazon Linux 2 EC2)
+## Deployment Instructions (Amazon Linux 2 EC2)
 
 ### ✅ Prerequisites
 
@@ -21,7 +21,7 @@ This is a static website for **Rushi Technologies** that showcases training prog
 - Upload(SCP) Or Clone the Code
 
 
-## 1. SSH into EC2 and install nginx and deploy website
+## SSH into EC2 and install nginx and deploy website
 
 ### Install nginx
 ```bash
@@ -52,16 +52,10 @@ http://<EC2_PUBLIC_IP>
 
 ---
 
-## 📜 Notes
-
-- Uses Nginx to serve HTML/CSS content
-- Responsive layout supported
-- Easily extendable with more pages or contact form
-
-## 🤝 Maintainer
+## Maintainer
 
 **Balaji Reddy Lachhannagri**  
-Senior DevOps Trainer  
+Senior DevOps Architech  
 
 ---
 
