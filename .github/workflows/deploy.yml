@@ -1,0 +1,63 @@
+name: Deploy to EC2 Server
+
+on:
+  workflow_run:
+    workflows: ["Build Docker Image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: rushi-tech-site
+      IMAGE_TAG: latest
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      REMOTE_USER: ec2-user
+      REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      EMAIL_TO: ${{ secrets.EMAIL_TO }}
+
+    steps:
+    - name: Deploy Docker Container to Remote Server
+      id: deploy
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ env.REMOTE_HOST }}
+        username: ${{ env.REMOTE_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          set -e
+          echo "[INFO] Logging into DockerHub..."
+          docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+
+          echo "[INFO] Removing existing container..."
+          docker rm -f rushi-container || true
+
+          echo "[INFO] Pulling latest image..."
+          docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+
+          echo "[INFO] Running new container..."
+          docker run -d -p 80:80 --name rushi-container $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+
+    - name: Gmail Notification
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ env.GMAIL_USER }}
+        password: ${{ env.GMAIL_APP_PASSWORD }}
+        subject: Deploy Job ${{ job.status }} - ${{ github.repository }}
+        to: ${{ env.EMAIL_TO }}
+        from: Rushi Deploy Bot <${{ env.GMAIL_USER }}>
+        content_type: text/html
+        body: |
+          <p><strong>Deployment Workflow:</strong> ${{ github.workflow }}</p>
+          <p><strong>Status:</strong> ${{ job.status }}</p>
+          <p><strong>Repo:</strong> ${{ github.repository }}</p>
+          <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Logs</a></p>

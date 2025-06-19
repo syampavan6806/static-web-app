@@ -1,0 +1,47 @@
+name: CI/CD Pipeline for Rushi Technologies Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: rushi-tech-site
+      IMAGE_TAG: latest
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      REMOTE_USER: ec2-user
+      REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+      SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Log in to DockerHub
+      run: echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+    - name: Build Docker Image
+      run: |
+        docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+
+    - name: Push Docker Image
+      run: |
+        docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ env.REMOTE_HOST }}
+        username: ${{ env.REMOTE_USER }}
+        key: ${{ env.SSH_PRIVATE_KEY }}
+        script: |
+          docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+          docker stop rushi-container || true
+          docker rm rushi-container || true
+          docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+          docker run -d -p 80:80 --name rushi-container $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
