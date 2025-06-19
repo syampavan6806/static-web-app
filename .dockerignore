@@ -1,4 +1,13 @@
-
-*.zip
-*.sh
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+node_modules
+dist
+*.log
+*.env
+*.DS_Store
+*.tmp
+*.github
+*.swp
 *.md
