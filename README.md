@@ -35,7 +35,7 @@ sudo systemctl start nginx
 # Remove Existing(Already Deployed) Files 
 sudo rm -rf /usr/share/nginx/html/*
 # Clone or pull(If already Cloned) Latest Code
-git clone <>
+git clone https://github.com/Rushi-Technologies/static-web-app.git
 sudo cp -r static-web-app/* /usr/share/nginx/html/
 ```
 ### start/restart nginx
